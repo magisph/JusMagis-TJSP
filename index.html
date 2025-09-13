@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Estudos Otimizado - Magistratura TJSP</title>
+    <style>
+        :root {
+            --primary-color: #0d47a1;
+            --secondary-color: #1976d2;
+            --background-color: #f4f7f9;
+            --font-color: #333;
+            --border-color: #ddd;
+            --header-bg: #fff;
+            --tab-hover-bg: #e3f2fd;
+            --progress-bg: #e0e0e0;
+            --progress-fill: #4caf50;
+            --row-completed-bg: #e8f5e9;
+            --box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            color: var(--font-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background-color: var(--header-bg);
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+        header {
+            padding: 20px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom: 5px solid var(--secondary-color);
+        }
+        header h1 { margin: 0; font-size: 2em; }
+        header p { margin: 5px 0 0; opacity: 0.9; }
+        
+        .progress-section { padding: 20px 30px; background-color: #fff; }
+        .progress-bar-container { background-color: var(--progress-bg); border-radius: 25px; height: 25px; overflow: hidden; width: 100%; }
+        .progress-bar {
+            background-color: var(--progress-fill);
+            height: 100%;
+            width: 0%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: width 0.4s ease-in-out;
+            white-space: nowrap;
+        }
+        
+        .main-content { display: flex; }
+        .tabs-nav { flex: 0 0 280px; background-color: #fff; border-right: 1px solid var(--border-color); padding: 15px 0; }
+        .tab-button {
+            display: block; width: 100%; padding: 12px 20px; border: none; background: none; text-align: left;
+            cursor: pointer; font-size: 1em; color: var(--font-color); border-left: 4px solid transparent; transition: all 0.3s;
+        }
+        .tab-button:hover { background-color: var(--tab-hover-bg); border-left-color: var(--secondary-color); }
+        .tab-button.active { background-color: var(--tab-hover-bg); font-weight: bold; color: var(--primary-color); border-left-color: var(--primary-color); }
+        .tab-progress { display: block; font-size: 0.75em; color: #777; }
+        
+        .tab-content-area { flex: 1; padding: 20px 30px; overflow-y: auto; max-height: 70vh; }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+        .tab-pane h2 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
+        th { background-color: #eef2f5; font-weight: 600; text-align: center; }
+        tr.topic-completed { background-color: var(--row-completed-bg) !important; }
+        tr:nth-child(even) { background-color: #f8fafd; }
+        td:first-child { min-width: 40%; }
+        
+        .topic-text { font-weight: 500; }
+        .notes { font-style: italic; color: #555; font-size: 0.9em; margin-top: 5px; display: block; }
+        
+        .control-cell { display: flex; align-items: center; gap: 8px; min-width: 180px; }
+        .control-cell input[type="checkbox"] { flex-shrink: 0; transform: scale(1.4); cursor: pointer; }
+        .control-cell input[type="date"] {
+            flex-grow: 1; padding: 6px; border: 1px solid var(--border-color); border-radius: 4px;
+            box-sizing: border-box; font-family: inherit; font-size: 0.9em;
+        }
+        
+        .instructions { background-color: var(--tab-hover-bg); border-left: 5px solid var(--secondary-color); padding: 15px; margin: 20px 0; border-radius: 5px; }
+        
+        @media (max-width: 992px) {
+            .main-content { flex-direction: column; }
+            .tabs-nav { display: flex; flex-wrap: wrap; flex: 1 1 auto; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .tab-button { flex: 1 1 150px; border-left: none; border-bottom: 4px solid transparent; }
+            .tab-button.active { border-left-color: transparent; border-bottom-color: var(--primary-color); }
+            .tab-content-area { max-height: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Plano de Estudos Otimizado - Magistratura TJSP</h1>
+            <p>Controle com checkboxes, preenchimento de data automático e progresso preciso.</p>
+        </header>
+
+        <div class="progress-section">
+            <label for="overall-progress"><strong>Progresso Geral do Edital (Estudo + 3 Revisões)</strong></label>
+            <div class="progress-bar-container" id="overall-progress">
+                <div id="overall-progress-bar" class="progress-bar">0%</div>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <nav class="tabs-nav" id="tabsNav">
+                </nav>
+            <div class="tab-content-area" id="tabContent">
+                <div id="home" class="tab-pane active">
+                    <h2>Seu Plano de Ação para a Aprovação!</h2>
+                    <div class="instructions">
+                        <p><strong>Como usar a ferramenta:</strong></p>
+                        <ul>
+                            <li><strong>Marque o checkbox</strong> para registrar a conclusão de uma etapa (Estudo ou Revisão).</li>
+                            <li>A <strong>data atual será preenchida automaticamente</strong>. Se precisar, você pode clicar no campo de data e alterá-la.</li>
+                            <li>O <strong>progresso é calculado com base nos checkboxes marcados</strong>. Cada etapa vale 25% de um tópico.</li>
+                            <li>Tópicos com as 4 etapas concluídas ficarão <strong>marcados em verde</strong>.</li>
+                            <li>Seu progresso é **salvo automaticamente**.</li>
+                        </ul>
+                    </div>
+                     <p>Esta versão foi aprimorada com seu feedback para ser a ferramenta definitiva no seu controle de estudos. Foco, disciplina e consistência!</p>
+                     <p>Bons estudos!</p>
+                </div>
+                </div>
+        </main>
+    </div>
+
+    <script>
+    const syllabus = {
+        "Direito Civil": [
+            { id: "civ1", text: "1. Lei de Introdução às Normas do Direito Brasileiro. Constitucionalização do Direito Civil. Direitos fundamentais e relações privadas." },
+            { id: "civ2", text: "2. Pessoas naturais. Direitos da personalidade. Personalidade e Capacidade. Incapacidade. Legitimação. Direitos da Personalidade. Ausência. Morte presumida. Estatuto da pessoa com deficiência. Estatuto da Criança e do Adolescente. Estatuto da Juventude. Estatuto do Idoso." },
+            { id: "civ3", text: "3. Pessoas jurídicas. Disposições Gerais. Personalidade jurídica da pessoa jurídica. Classificação. Associações. Fundações. Sociedades. Entidades sem personificação jurídica e novos sujeitos de direito. Desconsideração da personalidade jurídica." },
+            { id: "civ4", text: "4. Domicílio e Bens. Diferentes classes de bens e seus regimes jurídicos. Patrimônio e patrimônio separado." },
+            { id: "civ5", text: "5. Fatos jurídicos. Atos jurídicos. Negócios jurídicos. Disposições gerais. Existência. Validade. Eficácia." },
+            { id: "civ6", text: "6. Condição, termo e encargo. Representação." },
+            { id: "civ7", text: "7. Defeitos do negócio jurídico: erro, dolo, coação, fraude contra credores, lesão e estado de perigo." },
+            { id: "civ8", text: "8. Invalidade do negócio jurídico. Nulidade. Simulação. Distinções entre nulidade e anulabilidade. Conversão do negócio jurídico." },
+            { id: "civ9", text: "9. Ato lícito e ato ilícito. Abuso do direito. Teoria da aparência." },
+            { id: "civ10", text: "10. Prescrição e decadência. Da prova." },
+            { id: "civ11", text: "11. Obrigações. A obrigação como processo. Modalidades das obrigações. Obrigações de dar, fazer e não fazer. Obrigação natural. Obrigações alternativas. Obrigações facultativas. Indivisibilidade e solidariedade. Obrigações de meio, de resultado e de garantia. De execução instantânea, diferida e continuada. Obrigações propter rem." },
+            { id: "civ12", text: "12. Transmissão das obrigações. Cessão de Crédito. Assunção de dívida. Cessão de posição contratual." },
+            { id: "civ13", text: "13. Pagamento. Quem deve pagar e daqueles a quem se deve pagar. Objeto do pagamento e sua prova. Lugar e tempo do pagamento." },
+            { id: "civ14", text: "14. Pagamentos especiais. Pagamento por consignação e com sub-rogação. Imputação do pagamento. Dação em pagamento." },
+            { id: "civ15", text: "15. Extinção da obrigação sem pagamento: novação, compensação, confusão e remissão." },
+            { id: "civ16", text: "16. Inadimplemento. Disposições gerais. Mora e inadimplemento absoluto: caracterização, distinção e efeitos. Adimplemento substancial. Inadimplemento antecipado. Violação positiva do contrato. Perdas e danos. Juros legais e convencionais. Atualização monetária. Honorários de advogado. Excludentes de responsabilidade." },
+            { id: "civ17", text: "17. Cláusula penal. Arras. Preferências e privilégios creditórios." },
+            { id: "civ18", text: "18. Contratos em geral. Teoria geral dos negócios jurídicos e dos contratos. Negócios jurídicos unilaterais, bilaterais e plurilaterais. Conceito e características. Princípios do direito contratual. Cláusulas gerais. Boa-fé objetiva e suas funções. Função social do contrato. Equilíbrio contratual. Interpretação e qualificação dos contratos." },
+            { id: "civ19", text: "19. Classificação dos contratos. Contrato preliminar. Contratos coligados." },
+            { id: "civ20", text: "20. Formação dos contratos. Formação progressiva dos contratos. Elementos constitutivos, pressupostos de validade e fatores de eficácia dos contratos." },
+            { id: "civ21", text: "21. Contratos e terceiros. Estipulação em favor de terceiro. Promessa de fato de terceiro. Contrato com pessoa a declarar. Cessão da posição contratual e subcontrato." },
+            { id: "civ22", text: "22. Vícios redibitórios. Evicção." },
+            { id: "civ23", text: "23. Extinção dos contratos. Distrato e resilição unilateral. Resolução por inadimplemento. Cláusulas resolutivas tácita e expressa. Exceção do contrato não cumprido." },
+            { id: "civ24", text: "24. Resolução por onerosidade excessiva. Teoria da quebra da base do negócio jurídico. Revisão do contrato e suas modalidades. Frustração do contrato." },
+            { id: "civ25", text: "25. Compra e venda. Modalidades especiais da compra e venda. Troca ou permuta. Contrato estimatório." },
+            { id: "civ26", text: "26. Compromisso de compra e venda. Imóveis loteados, não loteados e em incorporação imobiliária. Imóveis rurais." },
+            { id: "civ27", text: "27. Doação. Disposições gerais. Invalidade. Revogação." },
+            { id: "civ28", text: "28. Locação de coisas. Lei do Inquilinato. Built to suit. Comodato. Mútuo. Prestação de serviço. Empreitada. Depósito. Mandato. Comissão. Corretagem. Transporte. Fiança. Transação. Compromisso. Contrato de administração fiduciária de garantias." },
+            { id: "civ29", text: "29. Seguro. Disposições gerais. Seguro de dano e seguro de pessoa. Seguro de responsabilidade civil. Contratos referentes a planos e seguros privados de assistência à saúde. Mora em contratos de seguro." },
+            { id: "civ30", text: "30. Atos unilaterais. Pagamento indevido. Enriquecimento sem causa. Promessa de recompensa. Gestão de negócios." },
+            { id: "civ31", text: "31. Responsabilidade civil. Princípios da solidariedade, prevenção e reparação integral do dano. Teorias subjetiva e objetiva. Boa-fé objetiva e responsabilidade civil. Responsabilidade pré e pós contratual. Função social e responsabilidade civil. O terceiro ofensor e o terceiro ofendido." },
+            { id: "civ32", text: "32. Funções da responsabilidade civil. Modalidades de responsabilidade civil. Responsabilidade civil e penal, e sua interferência. Responsabilidade contratual e aquiliana." },
+            { id: "civ33", text: "33. Elementos da responsabilidade civil. O ilícito. A culpa. O risco. Modalidades de risco. Dano. Dano material e dano moral. Dano estético. Dano à imagem. Perda de uma chance. Liquidação do dano. Nexo causal e suas teorias." },
+            { id: "civ34", text: "34. Excludentes de responsabilidade civil. Caso fortuito e força maior. Cláusula de não indenizar. Fato de terceiro. Fato exclusivo e concorrente da vítima. Excludentes de ilicitude civil. Responsabilidade civil por ato lícito." },
+            { id: "civ35", text: "35. Responsabilidade civil por fato próprio e por fato de terceiro. Responsabilidade por fato da coisa." },
+            { id: "civ36", text: "36. Responsabilidade civil da área médica e dos profissionais liberais. Responsabilidade civil digital. Marco civil da Internet. Responsabilidade dos incorporadores e construtores." },
+            { id: "civ37", text: "37. Direito das coisas em geral. Conceito e atributos de direitos reais. Princípios que regem os direitos reais. Distinções entre direitos reais e direitos obrigacionais." },
+            { id: "civ38", text: "38. Posse. Natureza e elementos. Detenção. Classificação. Aquisição, perda e transmissão. Efeitos. Exceção de domínio. Juízo petitório e juízo possessório. Composse. Função social da posse." },
+            { id: "civ39", text: "39. Propriedade. Função social. Propriedade urbana e rural. Estatuto da Terra e Estatuto das Cidades. Política agrícola e reforma agrária. Abuso do direito de propriedade. Aquisição da propriedade imóvel e móvel. Perda da propriedade. Usucapião. Aquisição pelo registro do título no Registro de imóveis. Acessão. Registro de Imóveis: noções gerais, registros e averbações, fé pública registral e legitimação registral, presunções decorrentes do registro predial. Princípios do direito registrário. Procedimento de dúvida de registro." },
+            { id: "civ40", text: "40. Direito de vizinhança. (1.277 a 1.313)" },
+            { id: "civ41", text: "41. Condomínio geral. Condomínio edilício. Condomínio de lotes e condomínio urbano simples. Condomínio em multipropriedade. Parcelamento do solo urbano. Modalidades. Loteamentos de acesso controlado. Incorporação imobiliária. Patrimônio de afetação em incorporação imobiliária e em loteamentos." },
+            { id: "civ42", text: "42. Direitos reais sobre coisas alheias: superfície, servidão, usufruto, uso e habitação. Enfiteuse e ocupação em terrenos de marinha." },
+            { id: "civ43", text: "43. Direitos reais de aquisição. Direito real de promitente comprador. Direito de laje. Concessão de uso especial para fins de moradia. Concessão de direito real de uso. Direitos oriundos da imissão provisória na posse. Respectivas cessões e promessa de cessão, eventuais transmissões e hipotecas desses direitos." },
+            { id: "civ44", text: "44. Direitos reais de garantia. Disposições gerais. Efeitos. Cláusula comissória. Hipoteca. Penhor. Marco legal das garantias (Lei nº 14.711/23)." },
+            { id: "civ45", text: "45. Propriedade resolúvel. Propriedade fiduciária. Alienação fiduciária em garantia no Código Civil e na legislação extravagante. Propriedade fiduciária de imóveis. Cessão fiduciária de crédito. Patrimônio separado. Patrimônio de afetação. Securitização. Fundo de investimentos." },
+            { id: "civ46", text: "46. Família. Conceito e modalidades de família. Princípios do direito de família. Famílias paralelas." },
+            { id: "civ47", text: "47. Casamento. Capacidade, impedimentos, causas suspensivas. Habilitação e celebração. Tipos de casamento. Provas e invalidade. Casamento putativo." },
+            { id: "civ48", text: "48. Efeitos do casamento. Efeitos pessoais. Dano moral por violação a deveres conjugais." },
+            { id: "civ49", text: "49. Efeitos patrimoniais. Disposições gerais, pacto antenupcial e regimes de bens." },
+            { id: "civ50", text: "50. Dissolução da sociedade conjugal e do vínculo matrimonial. Separação de fato." },
+            { id: "civ51", text: "51. Proteção da pessoa dos filhos. Guarda e visitas. Guarda unilateral e compartilhada. Alienação parental e abandono afetivo. Usufruto e administração dos bens dos filhos. Poder familiar." },
+            { id: "civ52", text: "52. União estável e concubinato. Requisitos e efeitos pessoais e patrimoniais. União homoafetiva." },
+            { id: "civ53", text: "53. Relações de Parentesco. Paternidade e filiação. Paternidade post mortem. Filiação por reprodução assistida. Reconhecimento da paternidade voluntário e judicial. Filiação biológica e sócioafetiva. Ação investigatória e negatória. Multiparentalidade. Danos morais nas relações familiares." },
+            { id: "civ54", text: "54. Alimentos entre parentes, cônjuges e companheiros." },
+            { id: "civ55", text: "55. Tutela. Curatela." },
+            { id: "civ56", text: "56. Sucessões. Disposições gerais. A herança e sua administração. Vocação hereditária. Aceitação e renúncia da herança. Cessão de herança. Excluídos da herança. Herança jacente. Petição de herança." },
+            { id: "civ57", text: "57. Sucessão Legítima. Ordem da vocação hereditária. Herdeiros necessários. Direito de representação." },
+            { id: "civ58", text: "58. Sucessão testamentária. Testamento em geral. Capacidade de testar. Formas de testamento. Disposições testamentárias. Codicilo. Legados. Direito de acrescer e substituições. Execução do testamento. Revogação, redução e rompimento. Deserdação." },
+            { id: "civ59", text: "59. Sonegados. Inventário e partilha. Colação e doação inoficiosa." },
+            { id: "civ60", text: "60. Direito de autor. Registros Públicos. Marco Civil da Internet. Lei Geral de Proteção de Dados e proteção de dados pessoais." },
+            { id: "civ61", text: "61. Súulas e precedentes vinculantes do Superior Tribunal de Justiça, do Supremo Tribunal Federal e do Tribunal de Justiça do Estado de São Paulo." }
+        ],
+        "Direito Processual Civil": [
+            { id: "prociv1", text: "1. Princípios constitucionais e infraconstitucionais do processo civil. Garantias constitucionais do processo. Autonomia do Direito Processual. Institutos e normas fundamentais do processo civil. Direito Processual Constitucional.", note: "OBS: PAREI NA PÁGINA 49 - AULA 4 custas e honorários" },
+            { id: "prociv2", text: "2. Interpretação da norma processual. Norma processual no tempo e no espaço. Efetividade do processo e acesso à Justiça. Escopos do processo. Instrumentalidade do processo." },
+            { id: "prociv3", text: "3. Jurisdição. Elementos conceituais. Características. Espécies. Organização judiciária. Distinção em relação às demais funções do Estado. Jurisdição estatal e arbitral. Poderes do juiz e do árbitro. Impedimento e suspeição." },
+            { id: "prociv4", text: "4. Competência. Critérios de determinação e de modificação. Incompetência absoluta e relativa. Conflito de competência. Cooperação internacional." },
+            { id: "prociv5", text: "5. Funções essenciais à Justiça. Magistratura. Advocacia Pública e Privada. Assistência judiciária. Taxa judiciária. Ministério Público. Órgãos auxiliares da justiça. Conciliadores e mediadores." },
+            { id: "prociv6", text: "6. A ação. Conceito e natureza. Condições da ação. Elementos da ação. Ação e tutela jurisdicional. Cumulação de ações. Classificação da tutela jurisdicional. Processo. Conceito e natureza. Espécies. Pressupostos processuais. Procedimento e relação jurídica processual." },
+            { id: "prociv7", text: "7. Atos processuais. Forma, tempo e lugar. Regime de invalidades processuais. Preclusões. Comunicação dos atos processuais. Atos processuais eletrônicos. Convenção das partes em matéria processual." },
+            { id: "prociv8", text: "8. Abuso do processo. Litigância de má-fé. Atos atentatórios à dignidade da Justiça." },
+            { id: "prociv9", text: "9. Partes e terceiros no processo civil. Conceitos. Litisconsórcio, assistência e modalidades de intervenção de terceiros. Amicus curiae. Incidente de desconsideração da personalidade jurídica." },
+            { id: "prociv10", text: "10. Tutela provisória. Tutela de urgência e tutela de evidência. Estabilização da tutela antecipada." },
+            { id: "prociv11", text: "11. Petição inicial. Requisitos. Juízo de Admissibilidade. Audiência de conciliação e mediação. Defesa do réu. Contestação e reconvenção. Providências preliminares. Julgamento conforme o estado do processo. Julgamento parcial do mérito. Audiência de saneamento e organização do processo." },
+            { id: "prociv12", text: "12. Provas. Objeto, fonte e meios. Prova atípica e prova ilícita. Ônus da prova. Distribuição dinâmica do ônus da prova. Inversão do ônus da prova. Antecipação da prova. Direito autônomo à prova. Provas em espécie e sua produção." },
+            { id: "prociv13", text: "13. Audiência de instrução e julgamento." },
+            { id: "prociv14", text: "14. Aporte de fatos ao processo. Iniciativa, forma e momento de aporte. Eixos lógico e imperativo do processo. Estabilização da demanda. Fatos e provas novos." },
+            { id: "prociv15", text: "15. Sentença. Elementos e requisitos. Vícios das sentenças. Coisa julgada formal e material. Limites subjetivos, objetivos e cronológicos. Eficácia preclusiva da coisa julgada. Coisa julgada e resolução de questão prejudicial. Relativização da coisa julgada." },
+            { id: "prociv16", text: "16. Recursos. Princípios gerais. Pressupostos de admissibilidade. Efeitos." },
+            { id: "prociv17", text: "17. Recursos em espécie: apelação, agravo de instrumento, embargos de declaração, recursos extraordinário e especial, embargos de divergência, agravo interno. Julgamento estendido em caso de divergência." },
+            { id: "prociv18", text: "18. Ações autônomas de impugnação. Ação rescisória. Reclamação." },
+            { id: "prociv19", text: "19. Precedentes judiciais. Incidente de resolução de demandas repetitivas. Julgamento de recursos repetitivos nos tribunais superiores. Assunção de competência. Súmula vinculante. Controle concentrado de constitucionalidade." },
+            { id: "prociv20", text: "20. Procedimentos especiais de jurisdição contenciosa. Ação de consignação em pagamento; ação de exigir contas; ações possessórias, ações de divisão e demarcação. Ação de dissolução parcial de sociedade." },
+            { id: "prociv21", text: "21. Procedimentos especiais de jurisdição contenciosa: inventário e partilha, embargos de terceiro, oposição, ações de família, habilitação, restauração de autos, ação monitória, homologação de penhor legal, regulação de avaria grossa." },
+            { id: "prociv22", text: "22. Meios alternativos de solução de conflitos." },
+            { id: "prociv23", text: "23. Arbitragem. Compromisso arbitral e cláusula compromissória. Tutelas de urgência antes, durante e depois da instauração do processo arbitral. Impugnação judicial da sentença arbitral. Instauração da arbitragem. Ação para obtenção do compromisso arbitral. Substituição e renúncia do árbitro. Responsabilidade do árbitro. Dever de revelação. Eficácia dos precedentes judiciais na arbitragem. Cooperação recíproca entre Poder Judiciário e Tribunal Arbitral." },
+            { id: "prociv24", text: "24. O Poder Público em juízo. Mandado de segurança. Ação Popular. Habeas data. Ação de improbidade administrativa. Execução fiscal e execução contra a Fazenda Pública. Suspensão de segurança." },
+            { id: "prociv25", text: "25. Tutela dos interesses transindividuais. Direitos e interesses difusos, coletivos e individuais homogêneos." },
+            { id: "prociv26", text: "26. Processos estruturais." },
+            { id: "prociv27", text: "27. Cumprimento de sentença e execução. Classificações. Pressupostos. Título executivo: espécies e requisitos. Liquidação." },
+            { id: "prociv28", text: "28. Cumprimento de sentença para pagamento de quantia certa. Cumprimento de sentença na obrigação de fazer, não fazer e entregar coisa. Cumprimento de sentença na obrigação de alimentos." },
+            { id: "prociv29", text: "29. Execução por quantia certa contra devedor solvente. Procedimento. Penhora, avaliação e expropriação. Satisfação do credor. Remição. Suspensão e extinção. Concurso de credores." },
+            { id: "prociv30", text: "30. Execução por quantia certa contra devedor insolvente. Conceito. Legitimidade. Declaração judicial de insolvência. Atribuições do administrador. Verificação e classificação dos créditos. Saldo devedor. Extinção das obrigações." },
+            { id: "prociv31", text: "31. Defesa do executado no cumprimento de sentença e na execução de título extrajudicial. Ações autônomas de impugnação à execução. Exceção de pré- executividade." },
+            { id: "prociv32", text: "32. Procedimento dos Juizados Especiais Cíveis e Juizados Especiais da Fazenda Pública. Juizados Especiais Federais." },
+            { id: "prociv33", text: "33. Procedimentos Especiais de Jurisdição Voluntária. Características. Notificação e interpelação. Alienações Judiciais. Testamento e Codicilo. Herança Jacente. Bens dos Ausentes. Coisas Vagas. Tutela e curatela. Organização e Fiscalização das Fundações." },
+            { id: "prociv34", text: "34. Ações locatícias. Ação de Despejo. Ação Renovatória. Ação Revisional. Ação Consignatória." },
+            { id: "prociv35", text: "35. O processo da recuperação judicial e da falência." }
+        ],
+        "Direito do Consumidor": [
+            { id: "consum1", text: "1. Direitos do consumidor. Disposições gerais. Política nacional de relações de consumo. Direitos básicos do consumidor. Legislação. Regulamentação (Decretos nºs 2.181/1997, 5.903/2006, 7.962/2013, 11.032/2022 e 11.150/2022).", note: "Obs: Já estudei os decretos" },
+            { id: "consum2", text: "2. Qualidade de produtos e serviços. Prevenção e reparação dos danos. Proteção à saúde e à segurança. Responsabilidade pelo fato do produto e do serviço. Responsabilidade por vício do produto e do serviço. Consumidor por equiparação (bystander). Cadeia produtiva e responsabilidade.", note: "obs: parei pág. 7 Dir. Cons. - proleges" },
+            { id: "consum3", text: "3. Decadência e prescrição. Desconsideração da personalidade jurídica." },
+            { id: "consum4", text: "4. Práticas comerciais. Disposições gerais. Oferta. Publicidade. Práticas abusivas. Cobrança de dívidas. Bancos de dados. Cadastros de consumidores. Propaganda dirigida ao público infantil" },
+            { id: "consum5", text: "5. Proteção contratual. Disposições gerais. Cláusulas abusivas. Contratos de adesão. Superendividamento. Proteção de crédito e direito do consumidor. Comércio eletrônico e direito do consumidor." },
+            { id: "consum6", text: "6. Sanções administrativas." },
+            { id: "consum7", text: "7. Defesa do consumidor em juízo. Disposições gerais. Ações coletivas para a defesa de interesses individuais homogêneos. Ações de responsabilização do fornecedor de produtos e serviços. Da tutela específica nas obrigações de fazer ou não fazer. Coisa julgada." },
+            { id: "consum8", text: "8. Sistema Nacional de defesa do consumidor. Convenção coletiva de consumo." },
+            { id: "consum9", text: "9. Súmulas e precedentes vinculantes do Superior Tribunal de Justiça, do Supremo Tribunal Federal e do Tribunal de Justiça do Estado de São Paulo." }
+        ],
+        "Direito da Criança e do Adolescente": [
+            { id: "eca1", text: "1. Consectários em matéria de criança e adolescente. Princípio da prioridade absoluta e proteção integral. Princípio do interesse superior da criança e do adolescente (ou do melhor interesse). Princípio da dignidade da pessoa humana. Princípio da participação popular. Princípio da excepcionalidade. Princípio da brevidade. Princípio da condição peculiar de pessoa em desenvolvimento. Interpretação e aplicação de normas sobre infância e adolescência." },
+            { id: "eca2", text: "2. Dos Direitos da criança e do adolescente no âmbito internacional: a) Convenções nº 138 e nº 182 da OIT; b) Declaração de Genebra; c) Declaração dos Direitos da Criança de 1959; d) Regras de Beijing; e) Convenção sobre os Direitos da Criança de 1989; f) Protocolo facultativo à Convenção sobre os Direitos da Criança da ONU; g) Sistema de Controle do Cumprimento dos Direitos Humanos de Crianças e o Terceiro Protocolo Facultativo." },
+            { id: "eca3", text: "3. Dos Direitos da criança e do adolescente no âmbito interno: a) Constituição Federal; b) Constituição Estadual; c) Estatuto da Criança e do Adolescente (Lei nº 8.069/90) e seus principais tópicos (Direito à Vida, Saúde, Liberdade, Respeito, Dignidade, Convivência Familiar e Comunitária, Educação, Cultura, Esporte, Lazer, Profissionalização, Proteção no Trabalho, Perda e suspensão do poder familiar, Família substituta, Medidas de proteção, Prevenção, Política de atendimento, Justiça da Infância e da Juventude, Conselho Tutelar, Ato infracional, Medidas socioeducativas, Infrações Administrativas); d) Lei do Sinase (lei 12.594/2012); e) Estatuto da Juventude (Lei nº 12.852/2013); f) Lei Brasileira de Inclusão da Pessoa com Deficiência (Lei nº 13.146/2015); g) Estatuto da Primeira Infância (Lei nº 13.257/2016); h) Sistema de garantia de direitos da criança e do adolescente vítima ou testemunha de violência (Lei nº 13.431/2017); i) Lei Henry Borel (Lei nº 14.344/2023); j) Lei da Criminalização do Bullying e do Cyberbullying (Lei nº 14.811/2024).", note: "Itens d, e, f, g, h, i, j marcados como estudados."}
+        ],
+        "Direito Penal": [
+            { id: "pen1", text: "I – Conceito de Direito Penal. Princípios Constitucionais Penais. História do Direito Penal. História do Direito Penal Brasileiro, Doutrinas e Escolas Penais. Fontes do Direito Penal. Sistemas Penitenciários." },
+            { id: "pen2", text: "II – CÓDIGO PENAL (Decreto-lei nº 2.848/40). 1 – Parte Geral: a) Da aplicação da lei penal (arts. 1º a 12). b) Do crime (arts. 13 a 25). c) Da imputabilidade penal (arts. 26 a 28). d) Do concurso de pessoas (arts. 29 a 31). e) Das penas (arts. 32 a 95). f) Das medidas de segurança (arts. 96 a 99). g) Da ação penal (arts. 100 a 106). h) Da extinção da punibilidade (arts. 107 a 120).", note: "Itens e, f, g marcados como estudados." },
+            { id: "pen3", text: "2 – Parte Especial: a) Dos crimes contra a pessoa (arts. 121 a 154-B). b) Dos crimes contra o patrimônio (arts. 155 a 183). c) Dos crimes contra a propriedade imaterial (arts. 184 a 186). d) Dos crimes contra a dignidade sexual (arts. 213 a 234-B). e) Dos crimes contra a família (arts. 235 a 249). f) Dos crimes contra a incolumidade pública (arts. 250 a 285). g) Dos crimes contra a paz pública (arts. 286 a 288-A). h) Dos crimes contra a fé pública (arts. 289 a 311-A). i) Dos crimes contra a administração pública (arts. 312 a 359-H). j) Dos Crimes Contra o Estado Democrático de Direito (arts. 359-I a 359-T)." },
+            { id: "pen4", text: "III – LEI DAS CONTRAVENÇÕES PENAIS (Decreto-lei nº 3.688/41)." },
+            { id: "pen5", text: "IV – LEGISLAÇÃO PENAL ESPECIAL: a) Crimes contra a economia popular; b) Genocídio; c) Crimes eleitorais; d) Responsabilidade dos prefeitos; e) Lei de Alimentos (art. 22); f) Parcelamento de Solo Urbano; g) Execução penal; h) Ação civil pública (art. 10); i) Preconceito de raça ou cor; j) Prisão temporária; k) Criança e adolescente; l) Crimes hediondos; m) Relações de consumo, ordem tributária e econômica; n) Juizados Especiais Criminais; o) Discriminação durante a gravidez; p) Crimes contra a propriedade industrial; q) Interceptação Telefônica; r) Crimes previstos na Lei de transplante de órgãos; s) Tortura; t) Trânsito; u) Crimes ambientais; v) Lavagem de Bens; w) Proteção a testemunhas; x) Idosos; y) Armas; z) Crimes na Lei de Falência; aa) Lei de Biossegurança; bb) Violência doméstica; cc) Lei de Drogas; dd) Organizações criminosas; ee) Pessoa com deficiência; ff) Terrorismo; gg) Escuta Especializada; hh) Abuso de Autoridade; ii) Pacote Anticrime; jj) Lei Henry Borel; kk) Lei Geral do Esporte.", note: "Itens c, d, y, ee, hh marcados como estudados." }
+        ],
+        "Direito Processual Penal": [
+            { id: "propen1", text: "I – Do processo penal em geral. Princípios Constitucionais e fontes do processo penal." },
+            { id: "propen2", text: "II – Código de Processo Penal: a) Disposições preliminares. b) Do inquérito policial. c) Da ação penal. d) Da ação civil. e) Da competência. f) Das questões e processos incidentes. g) Da prova. h) Do Juiz, do MP, do Acusado e Defensor, dos Assistentes e Auxiliares. i) Da prisão, das Medidas cautelares e da liberdade provisória. j) Das citações e intimações. k) Da sentença. l) Dos processos em espécie. m) Das nulidades e dos recursos em geral. n) Disposições gerais." },
+            { id: "propen3", text: "III – Mandado de segurança em matéria criminal (Lei nº 12.016/09)." },
+            { id: "propen4", text: "IV – LEGISLAÇÃO PENAL E PROCESSUAL PENAL ESPECIAL: (Lista de leis especiais de 1 a 37, conforme edital)", note: "Itens 3, 4, 25, 31, 34 marcados como estudados."}
+        ],
+        "Direito Constitucional": [
+            { id: "const1", text: "1. Constitucionalismo e teoria da constituição. Conceito e características. A Constituição em perspectiva histórico-evolutiva. Constitucionalismo contemporâneo. Antecedentes." },
+            { id: "const2", text: "2. Constituição e Neoconstitucionalismo. Estado Constitucional contemporâneo." },
+            { id: "const3", text: "3. Poder Constituinte." },
+            { id: "const4", text: "4. Emendas Constitucionais." },
+            { id: "const5", text: "5. Evolução político-constitucional brasileira. As Constituições Brasileiras." },
+            { id: "const6", text: "6. Estrutura, conteúdo e função das constituições. Preâmbulo. Disposições permanentes e transitórias." },
+            { id: "const7", text: "7. Teoria da norma constitucional. Eficácia e aplicabilidade. Norma constitucional no tempo e no espaço." },
+            { id: "const8", text: "8. Hermenêutica Constitucional. Métodos de Interpretação. Princípios da interpretação (unidade, concordância prática, ponderação, proporcionalidade, razoabilidade, supremacia, máxima eficácia, força normativa, interpretação conforme)." },
+            { id: "const9", text: "9. Mutação Constitucional." },
+            { id: "const10", text: "10. Reforma e Revisão Constitucional." },
+            { id: "const11", text: "11. Normas Constitucionais." },
+            { id: "const12", text: "12. Organização do Estado. Estado de Direito Democrático. Federação." },
+            { id: "const13", text: "13. A Federação Brasileira. Repartição de competências." },
+            { id: "const14", text: "14. Poder Legislativo. Congresso Nacional. Processo legislativo. Fiscalização Contábil, Financeira e Orçamentária. Tribunal de Contas da União. Cláusulas pétreas." },
+            { id: "const15", text: "15. Intervenção Federal e Estadual." },
+            { id: "const16", text: "16. Poder Executivo. Presidente e Vice-Presidente. Ministros de Estado. Conselhos. Administração Pública. Militares. Poder regulamentar. Agências reguladoras.", note: "obs: estudei do art. 37 ao 39 da CF. Seguir depois a partir do art. 76" },
+            { id: "const17", text: "17. Poder Judiciário. Competências dos Tribunais Superiores, Federais, do Trabalho, Eleitorais, Militares e Estaduais. Juizados Especiais." },
+            { id: "const18", text: "18. Direitos, garantias e deveres da Magistratura. Estatuto da Magistratura. Quinto constitucional. Conselho Nacional de Justiça. Autonomia do Poder Judiciário." },
+            { id: "const19", text: "19. Poder Judiciário Estadual (TJSP). Controle de constitucionalidade estadual." },
+            { id: "const20", text: "20. Funções essenciais da Justiça. Ministério Público, Advocacia e Defensoria Pública." },
+            { id: "const21", text: "21. Defesa do Estado e das Instituições Democráticas. Estado de Defesa e Estado de Sítio. Forças Armadas. Segurança Pública." },
+            { id: "const22", text: "22. Ordem Social. Educação, Cultura, Ciência e Tecnologia, Comunicação Social, Meio Ambiente, Família, Criança, Adolescente, Idoso, Índios." },
+            { id: "const23", text: "23. Reforma da Previdência/servidores públicos." },
+            { id: "const24", text: "24. Emenda Constitucional Emergencial." },
+            { id: "const25", text: "25. Ordem Econômica e Financeira." },
+            { id: "const26", text: "26. Tributação e Orçamento. Sistema tributário nacional e finanças públicas." },
+            { id: "const27", text: "27. Princípios fundamentais." },
+            { id: "const28", text: "28. Direitos Fundamentais. Teoria geral. Direitos civis e políticos. Tratados e Convenções Internacionais." },
+            { id: "const29", text: "29. Direitos Sociais e Coletivos." },
+            { id: "const30", text: "30. Acesso à justiça e garantias processuais fundamentais (Devido processo legal, contraditório, ampla defesa, isonomia, prova ilícita, presunção de inocência, etc)." },
+            { id: "const31", text: "31. Direitos de cidadania. Sufrágio. Plebiscito, Referendo e Iniciativa Popular." },
+            { id: "const32", text: "32. Garantias Fundamentais." },
+            { id: "const33", text: "33. Princípios de Defesa na Constituição Federal." },
+            { id: "const34", text: "34. Princípios constitucionais da Administração Pública." },
+            { id: "const35", text: "35. A Emenda Constitucional n° 45." },
+            { id: "const36", text: "36. Ações constitucionais." },
+            { id: "const37", text: "37. Ação Direta de Inconstitucionalidade. Ação Declaratória de Constitucionalidade. Arguição de Descumprimento de Preceito Fundamental. Mandado de Injunção. ADI por Omissão. ADI Interventiva." },
+            { id: "const38", text: "38. Controle da constitucionalidade (concentrado e difuso)." }
+        ],
+        "Direito Eleitoral": [
+            { id: "eleit1", text: "1. Estado Democrático de Direito. Cidadania. Sistema representativo. Soberania popular. Pluralismo político. Reforma política.", note: "parei pag. 72 ebook CPIURIS, Estudar súmulas TSE" },
+            { id: "eleit2", text: "2. Direitos políticos. Perda. Suspensão. Sufrágio universal. Voto." },
+            { id: "eleit3", text: "3. Características do voto. Partidos políticos. Criação, fusão e extinção. Fundo Partidário. Fidelidade partidária." },
+            { id: "eleit4", text: "4. Direito Eleitoral. Conceito. Fundamentos. Fontes e princípios. Interpretação. Aplicação subsidiária do CPC." },
+            { id: "eleit5", text: "5. Representação. Sufrágio. Sistemas Eleitorais (Majoritário e Proporcional)." },
+            { id: "eleit6", text: "6. Justiça Eleitoral. Organização. Competência. A ética do Juiz Eleitoral." },
+            { id: "eleit7", text: "7. Justiça Eleitoral no Brasil. Evolução histórica. Atividade consultiva. Resoluções normativas." },
+            { id: "eleit8", text: "8. Capacidade eleitoral. Alistamento eleitoral." },
+            { id: "eleit9", text: "9. Elegibilidade e Inelegibilidades. Domicílio Eleitoral. Filiação Partidária." },
+            { id: "eleit10", text: "10. Ministério Público Eleitoral. Organização. Atribuições." },
+            { id: "eleit11", text: "11. Democracia participativa. Plebiscito. Referendo." },
+            { id: "eleit12", text: "12. Processo Eleitoral. Convenções partidárias. Registro de candidatos. Impugnação." },
+            { id: "eleit13", text: "13. Campanha eleitoral. Financiamento e prestação de contas. Captação ilícita de recursos. Abuso de poder." },
+            { id: "eleit14", text: "14. Propaganda política e eleitoral. Pesquisas. Propaganda no rádio, TV e internet. Uso de IA." },
+            { id: "eleit15", text: "15. Garantias Eleitorais. Captação ilícita de sufrágio." },
+            { id: "eleit16", text: "16. Eleição. Atos preparatórios. Apuração e diplomação. Recurso contra a expedição de diploma." },
+            { id: "eleit17", text: "17. Ações judiciais eleitorais. Recursos Eleitorais. Ação rescisória eleitoral." },
+            { id: "eleit18", text: "18. Crimes eleitorais. Processo penal eleitoral." }
+        ],
+        "Direito Empresarial": [
+            { id: "emp1", text: "1. Direito Comercial: origens, história, autonomia, fontes e características. Teoria dos atos de comércio. Teoria da empresa." },
+            { id: "emp2", text: "2. O Direito Civil e o Direito Comercial: autonomia ou unificação." },
+            { id: "emp3", text: "3. Princípios constitucionais econômicos." },
+            { id: "emp4", text: "4. Direito de Empresa no Código Civil. Empresa e empresário. Atividade empresarial. Capacidade. Empresário rural." },
+            { id: "emp5", text: "5. Registro Público de Empresas Mercantis. Escrituração." },
+            { id: "emp6", text: "6. Estabelecimento empresarial. Nome empresarial. Ponto comercial, fundo de comércio e trespasse." },
+            { id: "emp7", text: "7. Propriedade industrial e intelectual. Invenção, Desenho Industrial, Marca, Patente." },
+            { id: "emp8", text: "8. Disciplina jurídica da concorrência. Concorrência desleal. Infração da ordem econômica." },
+            { id: "emp9", text: "9. Atividade empresarial e a publicidade: tutela do consumidor." },
+            { id: "emp10", text: "10. Teoria Geral do Direito Societário. Classificação das sociedades. Desconsideração da personalidade jurídica. Microempresa e EPP." },
+            { id: "emp11", text: "11. Sociedade em conta de participação." },
+            { id: "emp12", text: "12. Sociedade limitada." },
+            { id: "emp13", text: "13. Sociedade anônima." },
+            { id: "emp14", text: "14. Teoria Geral dos Títulos de Crédito. Letra de câmbio, nota promissória, cheque, duplicata. Títulos eletrônicos." },
+            { id: "emp15", text: "15. Contratos empresariais. Compra e venda mercantil, comissão, representação, concessão, franquia, factoring, leasing." },
+            { id: "emp16", text: "16. Contratos bancários e Sistema Financeiro Nacional." },
+            { id: "emp17", text: "17. Contratos de seguro." },
+            { id: "emp18", text: "18. O empresário e a relação de consumo. Comércio Eletrônico. LGPD em relações empresariais." },
+            { id: "emp19", text: "19. Teoria Geral da Falência. Processo de falência." },
+            { id: "emp20", text: "20. Teoria Geral da Recuperação da empresa (judicial e extrajudicial)." },
+            { id: "emp21", text: "21. Lei do Ambiente de Negócios (Lei n. 14.195/2021)." },
+            { id: "emp22", text: "22. SAF – Sociedade Anônima do Futebol (Lei n. 14.193/2021)." },
+            { id: "emp23", text: "23. Marco Legal das Startups (LC n° 182/2021)." }
+        ],
+        "Direito Tributário": [
+            { id: "trib1", text: "1. Direito Tributário. Conceito, Sistema Constitucional Tributário, Princípios." },
+            { id: "trib2", text: "2. Fontes do Direito Tributário. Legislação tributária." },
+            { id: "trib3", text: "3. Tributo. Definição. Tipologia tributária (Impostos, Taxas, Contribuição de Melhoria, Empréstimo Compulsório, Contribuições)." },
+            { id: "trib4", text: "4. Imunidades tributárias." },
+            { id: "trib5", text: "5. Regra da incidência tributária. Fato gerador. Obrigação tributária. Sujeito ativo e passivo. Base de cálculo e alíquota." },
+            { id: "trib6", text: "6. Crédito tributário. Lançamento. Suspensão, Extinção e Exclusão do crédito." },
+            { id: "trib7", text: "7. Infrações e sanções tributárias. Denúncia espontânea. Fraude à execução." },
+            { id: "trib8", text: "8. Garantias e privilégios do crédito tributário." },
+            { id: "trib9", text: "9. Administração tributária. Fiscalização. Dívida ativa." },
+            { id: "trib10", text: "10. Competência tributária. Tributos da União, dos Estados e dos Municípios." },
+            { id: "trib11", text: "11. Ações de natureza tributária. Execuções Fiscais." },
+            { id: "trib12", text: "12. Transações Tributárias." },
+            { id: "trib13", text: "13. Emenda Constitucional nº 132/2023." },
+            { id: "trib14", text: "14. Estatuto Nacional da Simplificação da Obrigação Tributária Acessória." }
+        ],
+        "Direito Ambiental": [
+            { id: "amb1", text: "1. Fundamentos éticos e filosóficos do direito ambiental." },
+            { id: "amb2", text: "2. A Constituição e o Meio Ambiente (Art. 225). Tratados Internacionais." },
+            { id: "amb3", text: "3. Princípios constitucionais ambientais (solidariedade intergeracional, desenvolvimento sustentável, poluidor-pagador, prevenção, precaução, etc)." },
+            { id: "amb4", text: "4. Deveres do Poder Público. Competências em matéria ambiental." },
+            { id: "amb5", text: "5. A comunidade e a tutela ambiental. Política Nacional de Educação Ambiental. Política Nacional do Meio Ambiente. Responsabilidade Administrativa e Civil.", note: "obs: estudei política nacional da educação e a PNMA" },
+            { id: "amb6", text: "6. Urbanismo. Meio ambiente urbano. Estatuto da Cidade e da Metrópole. Regularização fundiária. Áreas de risco." },
+            { id: "amb7", text: "7. Bem jurídico ambiental. Espaços ambientalmente protegidos. SISNAMA." },
+            { id: "amb8", text: "8. Patrimônio ambiental natural (Ar, Água, Solo, Flora, Fauna), cultural (Tombamento) e artificial. Proteção da vegetação nativa (Lei nº 12.651/12)." },
+            { id: "amb9", text: "9. Licenciamento ambiental. EIA/RIMA." },
+            { id: "amb10", text: "10. Política Nacional de Recursos Hídricos. Política Nacional de Saneamento Básico. Política Nacional de Resíduos Sólidos. Agrotóxicos." },
+            { id: "amb11", text: "11. Jurisprudência das Câmaras Reservadas ao Meio Ambiente do TJSP e dos Tribunais Superiores." },
+            { id: "amb12", text: "12. Instrumentos processuais da tutela ambiental (Inquérito civil, TAC, ACP, Ação popular, etc)." }
+        ],
+        "Direito Administrativo": [
+            { id: "adm1", text: "1. Lei de Introdução às Normas do Direito Brasileiro." },
+            { id: "adm2", text: "2. Princípios Constitucionais da Administração Pública. Inovações da Lei n. 13.655/2018 na LINDB." },
+            { id: "adm3", text: "3. Função pública. Delegação e avocação. Reserva de Administração." },
+            { id: "adm4", text: "4. Legalidade administrativa. Competências vinculadas e discricionárias. Consensualidade." },
+            { id: "adm5", text: "5. Estrutura da Administração Pública (Direta e Indireta). Desconcentração e descentralização." },
+            { id: "adm6", text: "6. Poder de Polícia. Conceito, limites, características. Delegação." },
+            { id: "adm7", text: "7. Poder de polícia e direitos reais. Limitações administrativas. Desapropriação." },
+            { id: "adm8", text: "8. Ato administrativo. Elementos, espécies, vícios. Revogação, invalidação, convalidação." },
+            { id: "adm9", text: "9. Regulamento administrativo." },
+            { id: "adm10", text: "10. Processo Administrativo. Lei Geral e Lei no Estado de São Paulo." },
+            { id: "adm11", text: "11. Bens públicos. Regime jurídico, espécies, uso." },
+            { id: "adm12", text: "12. Agentes públicos. Espécies. Concurso público. Regime disciplinar e previdenciário." },
+            { id: "adm13", text: "13. Organização funcional: cargos, empregos e funções públicas." },
+            { id: "adm14", text: "14. Discricionariedade: limites e fundamentos. Abuso e desvio de Poder." },
+            { id: "adm15", text: "15. Controle da Administração Pública (interno, externo, parlamentar, judicial, social, pelos Tribunais de Contas). Lei anticorrupção." },
+            { id: "adm16", text: "16. Contratos Administrativos (Leis nº 8.666/93 e nº 14.133/2021). Teoria Geral." },
+            { id: "adm17", text: "17. Consórcios Públicos. Contratos de Programa e de Rateio." },
+            { id: "adm18", text: "18. Licitação (Leis nº 8.666/93 e nº 14.133/2021). Princípios, modalidades, dispensa, inexigibilidade." },
+            { id: "adm19", text: "19. Serviços públicos. Conceito, regime jurídico, regulação." },
+            { id: "adm20", text: "20. Delegação do serviço público. Concessão e permissão." },
+            { id: "adm21", text: "21. Exploração de atividade econômica pelo Estado." },
+            { id: "adm22", text: "22. Parceria público privada (PPP)." },
+            { id: "adm23", text: "23. Regulação econômico-social. Agências reguladoras." },
+            { id: "adm24", text: "24. Fundações Públicas." },
+            { id: "adm25", text: "25. Responsabilidade Civil do Estado." },
+            { id: "adm26", text: "26. Desapropriação. Hipóteses. Procedimento." },
+            { id: "adm27", text: "27. Intervenção na propriedade (servidão, requisição, tombamento, etc)." },
+            { id: "adm28", text: "28. Responsabilidade administrativa, civil e criminal do agente público." },
+            { id: "adm29", text: "29. Improbidade administrativa (Lei nº 8.429/92 e nº 14.230/2021)." },
+            { id: "adm30", text: "30. Lei de Responsabilidade Fiscal (LC nº 101/2000).", note: "REVISAR OS ARTIGOS MARCADOS NO PDF DO LD" },
+            { id: "adm31", text: "31. Mandado de Segurança, Ação Popular e Ação Civil Pública." },
+            { id: "adm32", text: "32. Decadência e prescrição nas relações administrativas." },
+            { id: "adm33", text: "33. Arbitragem na Administração Pública." },
+            { id: "adm34", text: "34. Medidas para enfrentamento da emergência decorrente do coronavírus." }
+        ],
+        "Formação Humanística": [
+            { id: "hum1", text: "A) SOCIOLOGIA DO DIREITO: 1. Noções gerais e pré-sociologia. 2. Sociologia da administração judiciária. 3. Relações sociais e jurídicas. 4. Direito e Comunicação Social. 5. Conflitos sociais e mecanismos de resolução." },
+            { id: "hum2", text: "B) PSICOLOGIA JUDICIÁRIA: 1. Noções gerais e comunicação. 2. Assédio moral e sexual. 3. Teoria do conflito e mecanismos autocompositivos. 4. O processo psicológico e a verdade judicial." },
+            { id: "hum3", text: "C) ÉTICA E ESTATUTO JURÍDICO DA MAGISTRATURA: 1. Regime jurídico da magistratura. 2. Direitos e deveres. 3. Código de Ética. 4. Sistemas de controle interno do Judiciário. 5. Responsabilidade dos magistrados. 6. Administração judicial." },
+            { id: "hum4", text: "D) FILOSOFIA DO DIREITO: 1. Conceito de Justiça. 2. Conceito de Direito, Equidade e Moral. 3. Interpretação do Direito. 4. Realismo, pragmatismo e métodos decisórios. 5. História da filosofia do direito. 6. Positivismo e Iusnaturalismo. 7. Saberes filosóficos e jurídicos." },
+            { id: "hum5", text: "E) TEORIA GERAL DO DIREITO E DA POLÍTICA: 1. Conceito de direito, norma, princípios e regras. 2. Fontes do Direito. 3. Eficácia da lei no tempo. 4. Teoria Política. 5. Ideologias, autoridade e poder. 6. Declaração Universal dos Direitos do Homem. 7. Agenda 2030 e ODS. 8. Conceito de gênero e Protocolo de julgamento com perspectiva de gênero." },
+            { id: "hum6", text: "F) DIREITO DIGITAL: 1. 4ª Revolução Industrial e Transformação Digital no Judiciário. 2. Persecução Penal e novas tecnologias. 3. Contratos Inteligentes, Blockchain e Algoritmos. 4. LGPD e proteção de dados." },
+            { id: "hum7", text: "G) PRAGMATISMO, ANÁLISE ECONÔMICA DO DIREITO E ECONOMIA COMPORTAMENTAL: 1. Cognição do juiz e tomada de decisão. 2. Análise econômica do direito. 3. Economia comportamental. 4. Governança corporativa e Compliance. 5. Dirigismo estatal e intervenção." },
+            { id: "hum8", text: "H) DIREITO DA ANTIDISCRIMINAÇÃO: 1. Conceitos Fundamentais. 2. Modalidades de Discriminação. 3. Legislação. 4. Racismo, Sexismo, Intolerância Religiosa, LGBTQIA+fobia. 5. Ações Afirmativas. 6. Direitos dos Povos indígenas e comunidades tradicionais." }
+        ],
+        "Direitos Humanos": [
+            { id: "dh1", text: "1. Teoria Geral dos Direitos Humanos. Dignidade da pessoa humana." },
+            { id: "dh2", text: "2. Sistema global de proteção dos direitos humanos. Tribunal de Nuremberg. Convenção Americana sobre Direitos Humanos." },
+            { id: "dh3", text: "3. Sistema regional interamericano de proteção dos direitos humanos." },
+            { id: "dh4", text: "4. Controle de convencionalidade." },
+            { id: "dh5", text: "5. A relação entre o direito internacional dos direitos humanos e o direito brasileiro." },
+            { id: "dh6", text: "6. Os direitos humanos na Constituição Federal de 1988." },
+            { id: "dh7", text: "7. A jurisprudência do Supremo Tribunal Federal em matéria de direitos humanos." },
+            { id: "dh8", text: "8. Normas internacionais de proteção da criança, adolescente, mulher, idosos, e pessoas com deficiência." },
+            { id: "dh9", text: "9. Princípios das relações internacionais do Brasil e incorporação dos tratados de direitos humanos." },
+            { id: "dh10", text: "10. Direito dos Povos Originários. Demarcação de terras. Julgados do STF.", note: "falta a convenção dos povos indígenas e tribais e a resoluções do CNJ" },
+            { id: "dh11", text: "11. Imigrantes e refugiados: tutela jurídica." }
+        ]
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabsNav = document.getElementById('tabsNav');
+        const tabContent = document.getElementById('tabContent');
+        const storageKey = 'magistraturaTJSPStudyPlanFinal';
+        let studyData = JSON.parse(localStorage.getItem(storageKey)) || {};
+
+        function getTodayDateString() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function generateSyllabusHTML() {
+            Object.keys(syllabus).forEach(subject => {
+                const button = document.createElement('button');
+                button.className = 'tab-button';
+                button.dataset.tab = subject.replace(/\s/g, '');
+                button.innerHTML = `${subject} <span class="tab-progress" id="${subject.replace(/\s/g, '')}-progress">(0%)</span>`;
+                tabsNav.appendChild(button);
+
+                const pane = document.createElement('div');
+                pane.id = subject.replace(/\s/g, '');
+                pane.className = 'tab-pane';
+                
+                let tableHTML = `<h2>${subject}</h2><table>
+                                <thead>
+                                    <tr>
+                                        <th>Item do Edital</th>
+                                        <th>Estudo</th>
+                                        <th>Revisão 1</th>
+                                        <th>Revisão 2</th>
+                                        <th>Revisão 3</th>
+                                    </tr>
+                                </thead><tbody>`;
+
+                syllabus[subject].forEach(item => {
+                    const itemData = studyData[item.id] || {};
+                    const stages = ['study', 'rev1', 'rev2', 'rev3'];
+                    let controlCellsHTML = '';
+
+                    stages.forEach(stage => {
+                        const isChecked = itemData[`${stage}Checked`] || false;
+                        const dateValue = itemData[`${stage}Date`] || '';
+                        controlCellsHTML += `
+                            <td>
+                                <div class="control-cell">
+                                    <input type="checkbox" data-id="${item.id}" data-type="${stage}" ${isChecked ? 'checked' : ''}>
+                                    <input type="date" data-id="${item.id}" data-type="${stage}" value="${dateValue}">
+                                </div>
+                            </td>`;
+                    });
+
+                    tableHTML += `
+                        <tr id="row-${item.id}">
+                            <td>
+                                <span class="topic-text">${item.text}</span>
+                                ${item.note ? `<span class="notes">Nota: ${item.note}</span>` : ''}
+                            </td>
+                            ${controlCellsHTML}
+                        </tr>`;
+                });
+                
+                tableHTML += `</tbody></table>`;
+                pane.innerHTML = tableHTML;
+                tabContent.appendChild(pane);
+            });
+             Object.keys(syllabus).forEach(subject => {
+                syllabus[subject].forEach(item => {
+                    updateRowStyle(item.id);
+                });
+            });
+        }
+
+        function updateProgress() {
+            let totalWeightedItems = 0;
+            let completedWeightedItems = 0;
+
+            Object.keys(syllabus).forEach(subject => {
+                const subjectItems = syllabus[subject];
+                let subjectTotalWeighted = subjectItems.length * 4;
+                let subjectCompletedWeighted = 0;
+                
+                subjectItems.forEach(item => {
+                    const itemData = studyData[item.id] || {};
+                    if (itemData.studyChecked) subjectCompletedWeighted++;
+                    if (itemData.rev1Checked) subjectCompletedWeighted++;
+                    if (itemData.rev2Checked) subjectCompletedWeighted++;
+                    if (itemData.rev3Checked) subjectCompletedWeighted++;
+                });
+
+                totalWeightedItems += subjectTotalWeighted;
+                completedWeightedItems += subjectCompletedWeighted;
+
+                const percentage = subjectTotalWeighted > 0 ? ((subjectCompletedWeighted / subjectTotalWeighted) * 100).toFixed(0) : 0;
+                const progressSpan = document.getElementById(`${subject.replace(/\s/g, '')}-progress`);
+                if(progressSpan) progressSpan.textContent = `(${percentage}%)`;
+            });
+
+            const overallPercentage = totalWeightedItems > 0 ? ((completedWeightedItems / totalWeightedItems) * 100).toFixed(1) : 0;
+            const overallProgressBar = document.getElementById('overall-progress-bar');
+            overallProgressBar.style.width = `${overallPercentage}%`;
+            overallProgressBar.textContent = `${overallPercentage}%`;
+        }
+
+        function saveData() {
+            localStorage.setItem(storageKey, JSON.stringify(studyData));
+        }
+
+        function updateRowStyle(id) {
+            const row = document.getElementById(`row-${id}`);
+            if (!row) return;
+
+            const itemData = studyData[id] || {};
+            const isCompleted = itemData.studyChecked && itemData.rev1Checked && itemData.rev2Checked && itemData.rev3Checked;
+            
+            if (isCompleted) {
+                row.classList.add('topic-completed');
+            } else {
+                row.classList.remove('topic-completed');
+            }
+        }
+
+        function handleCheckboxChange(e) {
+            const checkbox = e.target;
+            const id = checkbox.dataset.id;
+            const type = checkbox.dataset.type;
+            const dateInput = document.querySelector(`input[type="date"][data-id="${id}"][data-type="${type}"]`);
+
+            if (!studyData[id]) studyData[id] = {};
+            
+            studyData[id][`${type}Checked`] = checkbox.checked;
+
+            if (checkbox.checked) {
+                if (!dateInput.value) {
+                    const todayStr = getTodayDateString();
+                    dateInput.value = todayStr;
+                    studyData[id][`${type}Date`] = todayStr;
+                }
+            } else {
+                dateInput.value = '';
+                studyData[id][`${type}Date`] = '';
+            }
+            
+            updateRowStyle(id);
+            saveData();
+            updateProgress();
+        }
+
+        function handleDateChange(e) {
+            const dateInput = e.target;
+            const id = dateInput.dataset.id;
+            const type = dateInput.dataset.type;
+            const checkbox = document.querySelector(`input[type="checkbox"][data-id="${id}"][data-type="${type}"]`);
+
+            if (!studyData[id]) studyData[id] = {};
+
+            studyData[id][`${type}Date`] = dateInput.value;
+            
+            const isChecked = !!dateInput.value;
+            checkbox.checked = isChecked;
+            studyData[id][`${type}Checked`] = isChecked;
+            
+            updateRowStyle(id);
+            saveData();
+            updateProgress();
+        }
+
+        tabsNav.addEventListener('click', e => {
+            const button = e.target.closest('button');
+            if (button) {
+                const tabId = button.dataset.tab;
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                button.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            }
+        });
+        
+        tabContent.addEventListener('change', e => {
+            if (e.target.type === 'checkbox') {
+                handleCheckboxChange(e);
+            } else if (e.target.type === 'date') {
+                handleDateChange(e);
+            }
+        });
+
+        // Initialize
+        generateSyllabusHTML();
+        updateProgress();
+        
+        const firstTabButton = tabsNav.querySelector('.tab-button');
+        if (firstTabButton) {
+            firstTabButton.click();
+        } else {
+            document.getElementById('home').classList.add('active');
+        }
+    });
+    </script>
+
+</body>
+</html>
